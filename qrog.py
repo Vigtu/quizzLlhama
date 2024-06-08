@@ -3,15 +3,15 @@ from crewai_tools import BaseTool
 import os
 import csv
 
-# Configurações de ambiente
+# Set the environment 
 os.environ["OPENAI_API_BASE"] = 'https://api.groq.com/openai/v1'
 os.environ["OPENAI_MODEL_NAME"] = 'llama3-70b-8192' 
 os.environ["OPENAI_API_KEY"] = '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'
 
-# Ferramenta customizada para buscar resposta no CSV
+# Custom tool to search the csv file
 class CSVSearchTool(BaseTool):
     name: str = "CSVSearchTool"
-    description: str = "Search for answers in a CSV file. The name of the file is 'DataScienceQA' and the file path is './DataScienceQA.csv'."
+    description: str = "Search for answers in a CSV file. The name of the file is 'DataScienceQA' and the file path is 'DataScienceQA.csv'."
 
     def _run(self, search_query: str, file_path: str = './DataScienceQA.csv') -> str:
         try:
@@ -24,9 +24,9 @@ class CSVSearchTool(BaseTool):
         except FileNotFoundError:
             return f"File not found: {file_path}"
 
-csv_search_tool = CSVSearchTool(csv='./DataScienceQA.csv')
+csv_search_tool = CSVSearchTool(csv='DataScienceQA.csv')
 
-# Configuração dos agentes
+# Setting up the Agents
 reader = Agent(
     role="questions and answers reader",
     goal="Accurately read the questions and answers data and provide this knowledge to the 'teacher' agent. Be careful to not answer the whole .csv file when you are reading.",
@@ -44,7 +44,7 @@ teacher = Agent(
     allow_delegation=False
 )
 
-# Função principal para consultas
+# Setting the query function
 def main_query(query):
     reader_task = Task(
         description=f"Find the answer to the question: '{query}'. Be careful to not answer the whole .csv file when you are reading.",
@@ -69,7 +69,7 @@ def main_query(query):
     output = crew.kickoff(inputs={'search_query': query})
     return output
 
-# Loop de perguntas e respostas
+# Loop to questions and answers 
 while True:
     ask_question = input("Ask a question about Data Science (or type 'exit' to quit): ")
     if ask_question.lower() == 'exit':

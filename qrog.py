@@ -1,14 +1,18 @@
-from crewai import Agent, Task, Crew, Process
-from crewai_tools import BaseTool
+import streamlit as st
 import os
 import csv
+import logging
+from crewai import Agent, Task, Crew, Process
+from crewai_tools import BaseTool
 
-# Set the environment 
+# Initialize logging
+logging.basicConfig(level=logging.DEBUG)
+
+# Set the environment
 os.environ["OPENAI_API_BASE"] = 'https://api.groq.com/openai/v1'
-os.environ["OPENAI_MODEL_NAME"] = 'llama3-70b-8192' 
+os.environ["OPENAI_MODEL_NAME"] = 'llama3-70b-8192'
 os.environ["OPENAI_API_KEY"] = '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'
 
-# Custom tool to search the csv file
 class CSVSearchTool(BaseTool):
     name: str = "CSVSearchTool"
     description: str = "Search for answers in a CSV file. The name of the file is 'DataScienceQA' and the file path is 'DataScienceQA.csv'."
@@ -24,9 +28,8 @@ class CSVSearchTool(BaseTool):
         except FileNotFoundError:
             return f"File not found: {file_path}"
 
-csv_search_tool = CSVSearchTool(csv='DataScienceQA.csv')
+csv_search_tool = CSVSearchTool()
 
-# Setting up the Agents
 reader = Agent(
     role="questions and answers reader",
     goal="Accurately read the questions and answers data and provide this knowledge to the 'teacher' agent. Be careful to not answer the whole .csv file when you are reading.",
@@ -44,7 +47,6 @@ teacher = Agent(
     allow_delegation=False
 )
 
-# Setting the query function
 def main_query(query):
     reader_task = Task(
         description=f"Find the answer to the question: '{query}'. Be careful to not answer the whole .csv file when you are reading.",
@@ -69,13 +71,23 @@ def main_query(query):
     output = crew.kickoff(inputs={'search_query': query})
     return output
 
-# Loop to questions and answers 
-while True:
-    ask_question = input("Ask a question about Data Science (or type 'exit' to quit): ")
-    if ask_question.lower() == 'exit':
-        break
-    try:
-        answer = main_query(ask_question)
-        print("Teacher's Answer:", answer)
-    except Exception as e:
-        print("An error occurred:", str(e))
+def main():
+    st.set_page_config(page_title="Data Science Teacher", page_icon=":book:")
+
+    st.header("Data Science Teacher Response Generator")
+    message = st.text_area("Ask a question about Data Science")
+
+    if message:
+        st.write("Generating the best response...")
+        try:
+            logging.debug("Calling main_query")
+            result = main_query(message)
+            logging.debug(f"Result: {result}")
+            st.info(result)
+        except Exception as e:
+            st.error(f"An error occurred: {str(e)}")
+            logging.error(f"Exception: {str(e)}")
+
+if __name__ == '__main__':
+    logging.debug("Starting app")
+    main()

@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.DEBUG)
 # Set the environment
 os.environ["OPENAI_API_BASE"] = 'https://api.groq.com/openai/v1'
 os.environ["OPENAI_MODEL_NAME"] = 'llama3-70b-8192'
-os.environ["OPENAI_API_KEY"] = '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'
+os.environ["OPENAI_API_KEY"] = 'your api key here'
 
 class CSVSearchTool(BaseTool):
     name: str = "CSVSearchTool"

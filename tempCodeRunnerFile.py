@@ -49,14 +49,14 @@ teacher = Agent(
 
 def main_query(query):
     reader_task = Task(
-        description=f"Find the answer to the question: '{query}'. You can provide a useful link to explain the query",
+        description=f"Find the answer to the question: '{query}'. Be careful to not answer the whole .csv file when you are reading.",
         agent=reader,
         expected_output=f"Answer the question: {query}",
         tools=[csv_search_tool]
     )
 
     teach_task = Task(
-        description=f"Use the structured summary of questions and answers data provided by the 'reader' agent to explain the question made in '{query}, You can provide a useful link to explain the query'.",
+        description=f"Use the structured summary of questions and answers data provided by the 'reader' agent to explain the question made in '{query}'.",
         agent=teacher,
         expected_input=reader_task.expected_output,
         expected_output="A clear and precise answer to the user's question."
@@ -72,10 +72,10 @@ def main_query(query):
     return output
 
 def main():
-    st.set_page_config(page_title="Vasu the Teacher", page_icon=":book:")
+    st.set_page_config(page_title="Data Science Teacher", page_icon=":book:")
 
-    st.header("Vasu the Teacher, Response Generator")
-    message = st.text_area("Ask a question")
+    st.header("Data Science Teacher Response Generator")
+    message = st.text_area("Ask a question about Data Science")
 
     if message:
         st.write("Generating the best response...")
